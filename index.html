@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NYAH PAIE — Externalisation de la paie pour TPE et PME</title>
+  <meta name="description" content="Bulletins conformes, DSN déposées, URSSAF maîtrisée. Externalisation de la paie à 25 € HT / bulletin, sans engagement, pour les TPE et PME françaises." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:       #0B1A3A;
+      --navy-deep:  #081428;
+      --gold:       #D4B064;
+      --gold-light: #E8C989;
+      --teal:       #2EA5A1;
+      --cream:      #FAF7F2;
+      --text:       #4A5568;
+      --white:      #ffffff;
+      --shadow:     0 2px 16px rgba(11,26,58,.08);
+      --shadow-md:  0 4px 32px rgba(11,26,58,.12);
+      --radius:     4px;
+      --transition: .2s ease;
+    }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--cream);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    h1,h2,h3,h4 { font-family: 'Playfair Display', serif; color: var(--navy); line-height: 1.2; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    ul { list-style: none; }
+    button { cursor: pointer; font-family: 'Inter', sans-serif; }
+
+    /* ── Layout helpers ── */
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 96px 0; }
+    .section-label { font-size: .75rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+    .section-title { font-size: clamp(1.75rem, 3vw, 2.5rem); margin-bottom: 16px; }
+    .section-sub { font-size: 1.05rem; color: var(--text); max-width: 560px; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; font-size: .9rem; font-weight: 600;
+      border: 2px solid transparent; border-radius: var(--radius);
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition);
+      letter-spacing: .02em;
+    }
+    .btn-gold {
+      background: var(--gold); color: var(--navy-deep); border-color: var(--gold);
+    }
+    .btn-gold:hover { background: var(--gold-light); border-color: var(--gold-light); box-shadow: 0 4px 16px rgba(212,176,100,.35); }
+    .btn-outline {
+      background: transparent; color: var(--white); border-color: rgba(255,255,255,.4);
+    }
+    .btn-outline:hover { border-color: var(--white); background: rgba(255,255,255,.06); }
+    .btn-outline-navy {
+      background: transparent; color: var(--navy); border-color: var(--navy);
+    }
+    .btn-outline-navy:hover { background: var(--navy); color: var(--white); }
+
+    /* ════════════════════════════════
+       HEADER
+    ════════════════════════════════ */
+    #header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(8,20,40,.96); backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(212,176,100,.15);
+      transition: box-shadow var(--transition);
+    }
+    #header.scrolled { box-shadow: 0 2px 24px rgba(0,0,0,.25); }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo img { height: 40px; width: auto; }
+    .logo-text { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--white); letter-spacing: .04em; }
+    .logo-text span { color: var(--gold); }
+
+    nav { display: flex; align-items: center; gap: 32px; }
+    nav a {
+      font-size: .85rem; font-weight: 500; color: rgba(255,255,255,.75);
+      transition: color var(--transition); letter-spacing: .02em;
+    }
+    nav a:hover { color: var(--white); }
+    .nav-cta { margin-left: 8px; }
+
+    /* Hamburger */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; padding: 6px; cursor: pointer;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--white); border-radius: 2px;
+      transition: transform .25s, opacity .25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none; position: absolute; top: 68px; left: 0; right: 0;
+      background: var(--navy-deep); border-top: 1px solid rgba(212,176,100,.12);
+      padding: 16px 24px 24px; flex-direction: column; gap: 4px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: .95rem; font-weight: 500; color: rgba(255,255,255,.8);
+      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.06);
+      transition: color var(--transition);
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover { color: var(--gold); }
+    .mobile-menu .btn { margin-top: 12px; text-align: center; justify-content: center; }
+
+    /* ════════════════════════════════
+       HERO
+    ════════════════════════════════ */
+    #hero {
+      min-height: 100vh; display: flex; align-items: center;
+      background: linear-gradient(150deg, var(--navy-deep) 0%, var(--navy) 60%, #0d2550 100%);
+      padding-top: 68px; position: relative; overflow: hidden;
+    }
+    #hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 80% 50%, rgba(46,165,161,.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content { max-width: 720px; padding: 80px 0; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: .75rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 24px;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: block; width: 24px; height: 1px; background: var(--gold);
+    }
+    h1.hero-title {
+      font-size: clamp(2.25rem, 5vw, 3.75rem); font-weight: 700;
+      color: var(--white); margin-bottom: 24px; line-height: 1.1;
+    }
+    h1.hero-title em { color: var(--gold); font-style: normal; }
+    .hero-sub {
+      font-size: 1.1rem; color: rgba(255,255,255,.72); max-width: 580px;
+      margin-bottom: 40px; line-height: 1.7;
+    }
+    .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 52px; }
+    .hero-reassurance {
+      display: flex; gap: 24px; flex-wrap: wrap;
+      padding-top: 36px; border-top: 1px solid rgba(255,255,255,.1);
+    }
+    .reassurance-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .82rem; font-weight: 500; color: rgba(255,255,255,.65);
+    }
+    .reassurance-item .dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0;
+    }
+
+    /* ════════════════════════════════
+       WHY US
+    ════════════════════════════════ */
+    #pourquoi { background: var(--white); }
+    .pain-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px; margin-top: 56px;
+    }
+    .pain-card {
+      background: var(--cream); border: 1px solid rgba(11,26,58,.06);
+      border-radius: var(--radius); padding: 32px 28px;
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+    .pain-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .pain-icon {
+      width: 48px; height: 48px; margin-bottom: 20px;
+      color: var(--navy);
+    }
+    .pain-card h3 { font-size: 1.05rem; margin-bottom: 10px; }
+    .pain-fact { font-size: .88rem; color: var(--text); margin-bottom: 14px; line-height: 1.6; }
+    .pain-benefit {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: .85rem; font-weight: 600; color: var(--navy);
+      border-top: 1px solid rgba(11,26,58,.08); padding-top: 14px; margin-top: 4px;
+    }
+    .pain-benefit::before {
+      content: ''; display: block; width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px;
+      background: var(--gold); border-radius: 50%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%230B1A3A'%3E%3Cpath d='M12.7 4.3a1 1 0 0 1 0 1.4l-5 5a1 1 0 0 1-1.4 0l-2-2a1 1 0 1 1 1.4-1.4L7 8.58l4.3-4.28a1 1 0 0 1 1.4 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: center; background-size: 10px;
+    }
+
+    /* ════════════════════════════════
+       OFFER
+    ════════════════════════════════ */
+    #offre { background: var(--cream); }
+    .offer-header { text-align: center; margin-bottom: 56px; }
+    .price-block {
+      display: flex; align-items: baseline; gap: 8px; justify-content: center;
+      margin: 24px 0 20px;
+    }
+    .price-amount { font-family: 'Playfair Display', serif; font-size: 4rem; font-weight: 700; color: var(--navy); line-height: 1; }
+    .price-unit { font-size: 1.1rem; color: var(--text); font-weight: 400; }
+    .offer-badge {
+      display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0;
+      background: var(--navy); color: var(--gold);
+      font-size: .8rem; font-weight: 600; letter-spacing: .05em;
+      border-radius: var(--radius); overflow: hidden; margin: 0 auto;
+    }
+    .offer-badge span {
+      padding: 8px 16px; border-right: 1px solid rgba(212,176,100,.2);
+    }
+    .offer-badge span:last-child { border-right: none; }
+
+    .offer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 56px; }
+    .offer-main {
+      background: var(--white); border: 1px solid rgba(11,26,58,.08);
+      border-radius: var(--radius); padding: 40px 36px; box-shadow: var(--shadow);
+    }
+    .offer-main h3 {
+      font-size: 1.15rem; margin-bottom: 28px; display: flex; align-items: center; gap: 10px;
+    }
+    .offer-main h3::after {
+      content: ''; flex: 1; height: 1px; background: rgba(11,26,58,.08);
+    }
+    .include-list { display: flex; flex-direction: column; gap: 14px; }
+    .include-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: .9rem; line-height: 1.5;
+    }
+    .include-item svg { flex-shrink: 0; margin-top: 2px; }
+
+    .offer-options {
+      background: var(--navy); border-radius: var(--radius); padding: 36px 32px;
+      display: flex; flex-direction: column;
+    }
+    .offer-options h3 { font-size: 1rem; color: var(--white); margin-bottom: 6px; }
+    .options-sub { font-size: .82rem; color: rgba(255,255,255,.5); margin-bottom: 24px; }
+    .option-list { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .option-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: .85rem; color: rgba(255,255,255,.75); line-height: 1.5;
+    }
+    .option-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--gold); flex-shrink: 0; margin-top: 7px;
+    }
+    .options-note {
+      margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(212,176,100,.15);
+      font-size: .78rem; color: rgba(255,255,255,.4); font-style: italic;
+    }
+    .offer-cta { text-align: center; margin-top: 48px; }
+
+    /* ════════════════════════════════
+       OBLIGATIONS
+    ════════════════════════════════ */
+    #obligations { background: var(--white); }
+    .obligations-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      margin-top: 56px; border: 1px solid rgba(11,26,58,.08); border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow);
+    }
+    .oblig-header {
+      padding: 16px 24px; font-size: .78rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+    .oblig-header.left { background: var(--navy); color: var(--gold); }
+    .oblig-header.right { background: var(--gold); color: var(--navy-deep); }
+    .oblig-row {
+      display: contents;
+    }
+    .oblig-cell {
+      padding: 18px 24px; font-size: .88rem; line-height: 1.55;
+      border-top: 1px solid rgba(11,26,58,.06);
+    }
+    .oblig-cell.left { color: var(--navy); font-weight: 500; background: var(--cream); }
+    .oblig-cell.right {
+      color: var(--navy); background: var(--white);
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .oblig-check {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%; background: var(--gold);
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .oblig-check svg { width: 10px; height: 10px; }
+
+    /* ════════════════════════════════
+       TESTIMONIALS
+    ════════════════════════════════ */
+    #temoignages { background: var(--cream); }
+    .testi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px; margin-top: 56px;
+    }
+    .testi-card {
+      background: var(--white); border: 1px solid rgba(11,26,58,.07);
+      border-radius: var(--radius); padding: 32px 28px; box-shadow: var(--shadow);
+      transition: box-shadow var(--transition);
+    }
+    .testi-card:hover { box-shadow: var(--shadow-md); }
+    .testi-stars { display: flex; gap: 3px; margin-bottom: 18px; }
+    .star { width: 16px; height: 16px; fill: var(--gold); }
+    .testi-quote {
+      font-size: .93rem; line-height: 1.7; color: var(--text);
+      margin-bottom: 24px; font-style: italic;
+    }
+    .testi-author { display: flex; align-items: center; gap: 14px; }
+    .testi-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 2px solid var(--gold); object-fit: cover; flex-shrink: 0;
+    }
+    .testi-name { font-weight: 600; font-size: .9rem; color: var(--navy); margin-bottom: 2px; }
+    .testi-role { font-size: .8rem; color: var(--text); }
+    .testi-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .72rem; font-weight: 600; color: var(--teal);
+      background: rgba(46,165,161,.08); border: 1px solid rgba(46,165,161,.2);
+      border-radius: 2px; padding: 2px 7px; margin-top: 6px;
+    }
+    .testi-badge::before { content: '✓'; }
+    .testi-disclaimer {
+      text-align: center; margin-top: 40px; font-size: .82rem;
+      color: rgba(74,85,104,.6); font-style: italic;
+    }
+
+    /* ════════════════════════════════
+       CONTACT
+    ════════════════════════════════ */
+    #contact {
+      background: var(--navy);
+      background-image: radial-gradient(ellipse 60% 80% at 90% 50%, rgba(46,165,161,.07) 0%, transparent 60%);
+    }
+    #contact .section-label { color: var(--gold); }
+    #contact .section-title { color: var(--white); }
+    #contact .section-sub { color: rgba(255,255,255,.6); }
+    .contact-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; margin-top: 56px; }
+    .contact-form {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius); padding: 40px 36px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+    .form-group label {
+      font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.6);
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius); padding: 12px 16px;
+      font-family: 'Inter', sans-serif; font-size: .9rem; color: var(--white);
+      outline: none; transition: border-color var(--transition), background var(--transition);
+      width: 100%;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--gold); background: rgba(255,255,255,.09);
+    }
+    .form-group select option { background: var(--navy); color: var(--white); }
+    .form-group textarea { resize: vertical; min-height: 110px; }
+    .form-submit { width: 100%; justify-content: center; font-size: .95rem; padding: 16px; }
+
+    .contact-info { display: flex; flex-direction: column; justify-content: center; gap: 0; }
+    .contact-info-title {
+      font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--white);
+      margin-bottom: 32px;
+    }
+    .contact-detail {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .contact-detail:last-child { border-bottom: none; }
+    .contact-detail-icon {
+      width: 40px; height: 40px; border-radius: var(--radius);
+      background: rgba(212,176,100,.1); border: 1px solid rgba(212,176,100,.2);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .contact-detail-icon svg { color: var(--gold); }
+    .contact-detail-label { font-size: .75rem; font-weight: 600; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .contact-detail-value { font-size: .95rem; color: rgba(255,255,255,.85); font-weight: 500; }
+
+    /* ════════════════════════════════
+       FOOTER
+    ════════════════════════════════ */
+    #footer {
+      background: var(--navy-deep); border-top: 1px solid rgba(212,176,100,.1);
+      padding: 40px 0;
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 20px;
+    }
+    .footer-brand { display: flex; align-items: center; gap: 12px; }
+    .footer-brand img { height: 34px; width: auto; }
+    .footer-brand-text { font-family: 'Playfair Display', serif; color: var(--white); font-size: 1rem; font-weight: 600; }
+    .footer-baseline { font-size: .75rem; color: rgba(255,255,255,.4); margin-top: 2px; }
+    .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-links a { font-size: .8rem; color: rgba(255,255,255,.4); transition: color var(--transition); }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-copy { font-size: .78rem; color: rgba(255,255,255,.3); }
+
+    /* ════════════════════════════════
+       ANIMATIONS
+    ════════════════════════════════ */
+    .fade-in {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: none; }
+    .fade-in:nth-child(2) { transition-delay: .1s; }
+    .fade-in:nth-child(3) { transition-delay: .2s; }
+    .fade-in:nth-child(4) { transition-delay: .3s; }
+    .fade-in:nth-child(5) { transition-delay: .4s; }
+
+    /* ════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .offer-grid { grid-template-columns: 1fr; }
+      .contact-layout { grid-template-columns: 1fr; gap: 40px; }
+      .obligations-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .hamburger { display: flex; }
+      .section { padding: 64px 0; }
+      .hero-content { padding: 60px 0; }
+      .offer-badge span { padding: 8px 10px; font-size: .72rem; }
+      .obligations-grid { grid-template-columns: 1fr; }
+      .oblig-header.left { display: none; }
+      .oblig-cell.left {
+        font-weight: 700; background: var(--navy); color: var(--white);
+        border-top: 2px solid rgba(212,176,100,.2);
+      }
+      .oblig-cell.right { background: var(--cream); }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-ctas { flex-direction: column; }
+      .btn { width: 100%; justify-content: center; }
+      .price-amount { font-size: 3rem; }
+    }
+
+    @media (min-width: 1440px) {
+      .container { max-width: 1280px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════ HEADER ════════ -->
+  <header id="header">
+    <div class="container header-inner">
+      <a href="#accueil" class="logo" aria-label="NYAH PAIE — Accueil">
+        <img src="assets/logo.png" alt="Logo NYAH PAIE" onerror="this.style.display='none'" />
+        <span class="logo-text">NYAH <span>PAIE</span></span>
+      </a>
+
+      <nav aria-label="Navigation principale">
+        <a href="#pourquoi">Pourquoi nous</a>
+        <a href="#offre">Offre</a>
+        <a href="#obligations">Obligations</a>
+        <a href="#contact">Contact</a>
+        <a href="#contact" class="btn btn-gold nav-cta">Devis gratuit</a>
+      </nav>
+
+      <button class="hamburger" aria-label="Ouvrir le menu" aria-expanded="false" id="hamburger">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+      <a href="#pourquoi">Pourquoi nous</a>
+      <a href="#offre">Offre</a>
+      <a href="#obligations">Obligations légales</a>
+      <a href="#contact">Contact</a>
+      <a href="#contact" class="btn btn-gold">Devis gratuit</a>
+    </div>
+  </header>
+
+  <!-- ════════ HERO ════════ -->
+  <section id="accueil" aria-label="Présentation">
+    <div id="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-eyebrow">Externalisation de la paie · France</div>
+          <h1 class="hero-title">L'externalisation de la paie,<br /><em>simplifiée.</em></h1>
+          <p class="hero-sub">Bulletins conformes, DSN déposées, URSSAF maîtrisée. Pour les TPE et PME qui veulent sécuriser leur paie et se concentrer sur leur métier.</p>
+          <div class="hero-ctas">
+            <a href="#contact" class="btn btn-gold">Demander un devis</a>
+            <a href="#offre" class="btn btn-outline">Voir notre offre</a>
+          </div>
+          <div class="hero-reassurance">
+            <div class="reassurance-item"><span class="dot"></span>25 € HT / bulletin</div>
+            <div class="reassurance-item"><span class="dot"></span>Réponse sous 24h</div>
+            <div class="reassurance-item"><span class="dot"></span>Conformité garantie</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ POURQUOI NOUS ════════ -->
+  <section id="pourquoi" class="section" aria-label="Pourquoi choisir NYAH PAIE">
+    <div class="container">
+      <div class="section-label">Pourquoi nous choisir</div>
+      <h2 class="section-title">La paie est le principal risque opérationnel<br />que les dirigeants sous-estiment.</h2>
+      <p class="section-sub">Cinq réalités que nos clients connaissaient bien avant de nous confier leur paie.</p>
+
+      <div class="pain-grid">
+        <!-- Pain 1 -->
+        <div class="pain-card fade-in">
+          <svg class="pain-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <rect x="8" y="10" width="32" height="28" rx="3"/>
+            <line x1="16" y1="20" x2="32" y2="20"/>
+            <line x1="16" y1="26" x2="26" y2="26"/>
+            <circle cx="35" cy="35" r="7" fill="white" stroke-width="1.5"/>
+            <line x1="35" y1="31" x2="35" y2="36"/>
+            <line x1="35" y1="38" x2="35" y2="39"/>
+          </svg>
+          <h3>Les erreurs de bulletin restent trop fréquentes</h3>
+          <p class="pain-fact">En France, une PME sur trois déclare avoir subi au moins un contentieux paie au cours des deux dernières années — régularisations coûteuses, tensions avec les salariés, risque de redressement.</p>
+          <div class="pain-benefit">Chez NYAH PAIE, chaque bulletin est contrôlé avant envoi selon un processus en double validation. Zéro approximation.</div>
+        </div>
+
+        <!-- Pain 2 -->
+        <div class="pain-card fade-in">
+          <svg class="pain-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <circle cx="24" cy="24" r="16"/>
+            <line x1="24" y1="14" x2="24" y2="25"/>
+            <line x1="24" y1="25" x2="30" y2="31"/>
+            <circle cx="38" cy="12" r="6" fill="white" stroke-width="1.5"/>
+            <line x1="38" y1="9" x2="38" y2="13"/>
+            <line x1="38" y1="14.5" x2="38" y2="15.5"/>
+          </svg>
+          <h3>La DSN ne laisse aucune marge d'erreur</h3>
+          <p class="pain-fact">La Déclaration Sociale Nominative est mensuelle, obligatoire et sanctionnée : 750 € par salarié en cas d'omission ou d'erreur déclarée. Nombre de dirigeants ignorent encore l'étendue de cette obligation.</p>
+          <div class="pain-benefit">NYAH PAIE dépose votre DSN mensuelle et vos DSN événementielles — dans les délais, sans exception.</div>
+        </div>
+
+        <!-- Pain 3 -->
+        <div class="pain-card fade-in">
+          <svg class="pain-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M12 36 L24 12 L36 36 Z"/>
+            <line x1="24" y1="22" x2="24" y2="30"/>
+            <circle cx="24" cy="33" r="1.5" fill="currentColor" stroke="none"/>
+          </svg>
+          <h3>L'URSSAF contrôle davantage les TPE</h3>
+          <p class="pain-fact">Les contrôles URSSAF ont augmenté de 18 % en 2024 sur les structures de moins de 20 salariés. Un redressement moyen dépasse 9 000 € — souvent pour des erreurs de classification ou de base de cotisation.</p>
+          <div class="pain-benefit">Notre équipe intègre chaque évolution des taux et des assiettes en temps réel. Votre exposition au risque est réduite au minimum.</div>
+        </div>
+
+        <!-- Pain 4 -->
+        <div class="pain-card fade-in">
+          <svg class="pain-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <circle cx="24" cy="18" r="8"/>
+            <path d="M10 38 C10 30 38 30 38 38"/>
+            <line x1="32" y1="28" x2="40" y2="36"/>
+            <line x1="36" y1="28" x2="36" y2="36"/>
+            <line x1="32" y1="32" x2="40" y2="32"/>
+          </svg>
+          <h3>Gérer la paie en interne coûte plus cher qu'on ne le croit</h3>
+          <p class="pain-fact">Entre le logiciel de paie, les heures de votre comptable ou assistante de direction, et la veille conventionnelle, la gestion interne d'un bulletin revient en moyenne à 45-60 € — bien au-delà d'une externalisation.</p>
+          <div class="pain-benefit">À 25 € HT / bulletin, NYAH PAIE réduit votre coût réel de traitement de paie de 40 % en moyenne dès le premier mois.</div>
+        </div>
+
+        <!-- Pain 5 -->
+        <div class="pain-card fade-in">
+          <svg class="pain-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <rect x="10" y="10" width="28" height="28" rx="3"/>
+            <line x1="17" y1="10" x2="17" y2="38"/>
+            <line x1="10" y1="20" x2="38" y2="20"/>
+            <line x1="10" y1="29" x2="38" y2="29"/>
+            <line x1="26" y1="10" x2="26" y2="20"/>
+          </svg>
+          <h3>La veille légale est un travail à temps plein</h3>
+          <p class="pain-fact">SMIC, conventions collectives, index pénibilité, taux AT/MP, prélèvement à la source, nouvelles exonérations : le Code du travail évolue en permanence. Une mise à jour manquée peut engager votre responsabilité.</p>
+          <div class="pain-benefit">NYAH PAIE intègre automatiquement chaque évolution légale et conventionnelle. Vous n'avez rien à suivre.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ OFFRE ════════ -->
+  <section id="offre" class="section" aria-label="Notre offre tarifaire">
+    <div class="container">
+      <div class="offer-header">
+        <div class="section-label">Notre offre</div>
+        <h2 class="section-title">Un tarif unique. Zéro surprise.</h2>
+        <div class="price-block">
+          <span class="price-amount">25 €</span>
+          <span class="price-unit">HT / bulletin</span>
+        </div>
+        <div class="offer-badge">
+          <span>Sans frais cachés</span>
+          <span>Sans engagement</span>
+          <span>Vous payez uniquement ce que vous utilisez</span>
+        </div>
+      </div>
+
+      <div class="offer-grid">
+        <!-- Inclus -->
+        <div class="offer-main fade-in">
+          <h3>Inclus dans les 25 € HT / bulletin</h3>
+          <ul class="include-list">
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Collecte mensuelle de toutes vos variables de paie — heures supplémentaires, primes, absences, acomptes
+            </li>
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Édition du bulletin de paie conforme, remis au salarié en format PDF sécurisé
+            </li>
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Vérification systématique de la conformité légale et conventionnelle avant émission
+            </li>
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Dépôt de la DSN mensuelle et des DSN événementielles (arrêts de travail, embauches, fins de contrat)
+            </li>
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Déclarations auprès de l'URSSAF et de l'ensemble des organismes sociaux (retraite, prévoyance, mutuelle)
+            </li>
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Traitement des arrêts maladie, maternité et accidents du travail — indemnités journalières incluses
+            </li>
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Suivi des congés payés, des RTT et de l'ensemble des absences
+            </li>
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Calcul du solde de tout compte et édition des documents de fin de contrat (certificat de travail, attestation France Travail, reçu pour solde de tout compte)
+            </li>
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Application automatique de chaque évolution légale et conventionnelle — sans action de votre part
+            </li>
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Coffre-fort électronique pour la remise dématérialisée des bulletins aux salariés
+            </li>
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Archivage légal des bulletins pendant 5 ans, conforme aux obligations réglementaires
+            </li>
+            <li class="include-item">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="9" fill="#D4B064"/>
+                <path d="M5 9.5l3 3 5-5" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Accès à une hotline paie dédiée — réponse garantie sous 24h ouvrées
+            </li>
+          </ul>
+        </div>
+
+        <!-- Options -->
+        <div class="offer-options fade-in">
+          <h3>Services complémentaires</h3>
+          <p class="options-sub">Transparent et à la demande — tarifs sur devis, sans surprise.</p>
+          <ul class="option-list">
+            <li class="option-item"><span class="option-dot"></span>Portail salarié en libre-service (consultation des bulletins, demandes de congés en ligne)</li>
+            <li class="option-item"><span class="option-dot"></span>Rédaction de contrats de travail et d'avenants</li>
+            <li class="option-item"><span class="option-dot"></span>Déclaration préalable à l'embauche (DPAE)</li>
+            <li class="option-item"><span class="option-dot"></span>Suivi des visites médicales obligatoires</li>
+            <li class="option-item"><span class="option-dot"></span>Gestion et remboursement des notes de frais</li>
+            <li class="option-item"><span class="option-dot"></span>Rupture conventionnelle — montage et dépôt du dossier</li>
+            <li class="option-item"><span class="option-dot"></span>Audit social et paie ponctuel</li>
+            <li class="option-item"><span class="option-dot"></span>Conseil RH (procédures disciplinaires, restructuration, règlement intérieur)</li>
+            <li class="option-item"><span class="option-dot"></span>Bilan social annuel (entreprises de plus de 50 salariés)</li>
+            <li class="option-item"><span class="option-dot"></span>Formation de vos équipes aux outils de paie</li>
+          </ul>
+          <p class="options-note">Ces prestations sont facturées séparément, sur devis, selon vos besoins réels. Aucun abonnement imposé.</p>
+        </div>
+      </div>
+
+      <div class="offer-cta">
+        <a href="#contact" class="btn btn-gold" style="font-size:1rem;padding:16px 36px;">Demander un devis personnalisé</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ OBLIGATIONS ════════ -->
+  <section id="obligations" class="section" aria-label="Obligations légales">
+    <div class="container">
+      <div class="section-label">Conformité</div>
+      <h2 class="section-title">Ce que la loi vous impose.<br />Ce que nous gérons pour vous.</h2>
+      <p class="section-sub">En France, la paie est encadrée par des obligations précises. Voici ce que chaque dirigeant doit assurer — et comment NYAH PAIE s'en charge à votre place.</p>
+
+      <div class="obligations-grid" role="table" aria-label="Obligations légales et prise en charge NYAH PAIE">
+        <div class="oblig-header left" role="columnheader">Obligation légale</div>
+        <div class="oblig-header right" role="columnheader">Chez NYAH PAIE</div>
+
+        <div class="oblig-cell left" role="cell">DSN mensuelle avant le 5 ou le 15 de chaque mois, selon votre effectif</div>
+        <div class="oblig-cell right" role="cell"><span class="oblig-check"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2.5 3.5-4" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Dépôt systématique dans les délais, avec suivi des accusés de réception</div>
+
+        <div class="oblig-cell left" role="cell">Déclarations et règlement des cotisations URSSAF</div>
+        <div class="oblig-cell right" role="cell"><span class="oblig-check"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2.5 3.5-4" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Calcul exact des bases et des taux, déclaration et télérèglement intégrés</div>
+
+        <div class="oblig-cell left" role="cell">Remise dématérialisée du bulletin via un coffre-fort électronique (obligatoire depuis 2017)</div>
+        <div class="oblig-cell right" role="cell"><span class="oblig-check"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2.5 3.5-4" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Coffre-fort électronique inclus pour chaque salarié dès le premier bulletin</div>
+
+        <div class="oblig-cell left" role="cell">Conservation des bulletins pendant 5 ans minimum</div>
+        <div class="oblig-cell right" role="cell"><span class="oblig-check"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2.5 3.5-4" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Archivage légal sécurisé, accessible à tout moment depuis votre espace</div>
+
+        <div class="oblig-cell left" role="cell">Application de la bonne convention collective et de ses avenants</div>
+        <div class="oblig-cell right" role="cell"><span class="oblig-check"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2.5 3.5-4" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Veille conventionnelle permanente intégrée — chaque mise à jour s'applique automatiquement</div>
+
+        <div class="oblig-cell left" role="cell">Respect du SMIC et des minima conventionnels à chaque revalorisation</div>
+        <div class="oblig-cell right" role="cell"><span class="oblig-check"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2.5 3.5-4" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Mise à jour immédiate à chaque revalorisation légale ou conventionnelle</div>
+
+        <div class="oblig-cell left" role="cell">Égalité de rémunération et index égalité professionnelle (Loi Avenir Professionnel)</div>
+        <div class="oblig-cell right" role="cell"><span class="oblig-check"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2.5 3.5-4" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Suivi des écarts de rémunération et préparation des données pour le calcul de l'index</div>
+
+        <div class="oblig-cell left" role="cell">Déclaration et suivi des accidents du travail et maladies professionnelles</div>
+        <div class="oblig-cell right" role="cell"><span class="oblig-check"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2.5 3.5-4" stroke="#0B1A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Déclarations AT/MP dans les délais, calcul des indemnités complémentaires</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ CONTACT ════════ -->
+  <section id="contact" class="section" aria-label="Formulaire de contact">
+    <div class="container">
+      <div class="section-label">Contact</div>
+      <h2 class="section-title" style="color:var(--white)">Parlons de votre paie.</h2>
+      <p class="section-sub" style="color:rgba(255,255,255,.6)">Réponse sous 24h ouvrées. Aucun engagement.</p>
+
+      <div class="contact-layout">
+        <form class="contact-form" action="mailto:contact@nyahpaie.fr" method="post" enctype="text/plain" aria-label="Formulaire de demande de devis">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nom">Nom</label>
+              <input type="text" id="nom" name="nom" placeholder="Votre nom" required autocomplete="name" />
+            </div>
+            <div class="form-group">
+              <label for="email">Adresse e-mail</label>
+              <input type="email" id="email" name="email" placeholder="vous@entreprise.fr" required autocomplete="email" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="salaries">Nombre de salariés</label>
+            <select id="salaries" name="salaries" required>
+              <option value="" disabled selected>Sélectionner</option>
+              <option value="1-5">1 à 5 salariés</option>
+              <option value="6-10">6 à 10 salariés</option>
+              <option value="11-20">11 à 20 salariés</option>
+              <option value="21-50">21 à 50 salariés</option>
+              <option value="50+">Plus de 50 salariés</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="message">Votre message</label>
+            <textarea id="message" name="message" placeholder="Décrivez votre situation, vos besoins ou posez vos questions…"></textarea>
+          </div>
+          <button type="submit" class="btn btn-gold form-submit">Envoyer ma demande</button>
+        </form>
+
+        <div class="contact-info">
+          <div class="contact-info-title">Un interlocuteur dédié,<br />pas un formulaire sans suite.</div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <div class="contact-detail-label">E-mail</div>
+              <a href="mailto:contact@nyahpaie.fr" class="contact-detail-value">contact@nyahpaie.fr</a>
+            </div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div>
+              <div class="contact-detail-label">Site web</div>
+              <div class="contact-detail-value">nyahpaie.fr</div>
+            </div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <div class="contact-detail-label">Zone d'intervention</div>
+              <div class="contact-detail-value">France entière — 100 % dématérialisé</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ FOOTER ════════ -->
+  <footer id="footer" aria-label="Pied de page">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="assets/logo.png" alt="Logo NYAH PAIE" onerror="this.style.display='none'" />
+        <div>
+          <div class="footer-brand-text">NYAH PAIE</div>
+          <div class="footer-baseline">Externalisation de la paie · Conseils RH</div>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="#">Mentions légales</a>
+        <a href="#">CGV</a>
+        <a href="#">Politique de confidentialité</a>
+      </div>
+      <div class="footer-copy">&copy; 2026 NYAH PAIE. Tous droits réservés.</div>
+    </div>
+  </footer>
+
+  <script>
+    // Header scroll effect
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+
+    // Hamburger menu
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      const open = hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open', open);
+      hamburger.setAttribute('aria-expanded', open);
+      mobileMenu.setAttribute('aria-hidden', !open);
+    });
+
+    // Close mobile menu on link click
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        mobileMenu.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+      });
+    });
+
+    // Fade-in on scroll
+    const fadeEls = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    fadeEls.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
