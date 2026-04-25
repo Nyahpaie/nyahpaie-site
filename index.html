@@ -415,6 +415,56 @@
     .footer-copy { font-size: .78rem; color: rgba(255,255,255,.3); }
 
     /* ════════════════════════════════
+       BARRE DE PROGRESSION
+    ════════════════════════════════ */
+    #scroll-progress {
+      position: fixed; top: 0; left: 0; height: 3px; z-index: 200;
+      background: var(--gold); width: 0%; transition: width .1s linear;
+    }
+
+    /* ════════════════════════════════
+       FAQ ACCORDÉON
+    ════════════════════════════════ */
+    #faq { background: var(--cream); }
+    .faq-list { margin-top: 48px; display: flex; flex-direction: column; gap: 12px; max-width: 800px; }
+    .faq-item { border: 1px solid rgba(11,26,58,.1); border-radius: var(--radius); overflow: hidden; background: var(--white); }
+    .faq-question {
+      width: 100%; text-align: left; padding: 20px 24px;
+      background: none; border: none; font-family: 'Playfair Display', serif;
+      font-size: 1rem; color: var(--navy); font-weight: 600;
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      cursor: pointer;
+    }
+    .faq-icon { width: 20px; height: 20px; flex-shrink: 0; color: var(--gold); transition: transform .3s; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height .35s ease, padding .35s ease; }
+    .faq-answer-inner { padding: 0 24px 20px; font-size: .92rem; color: var(--text); line-height: 1.7; }
+    .faq-item.open .faq-answer { max-height: 300px; }
+
+    /* ════════════════════════════════
+       POPUP DE SORTIE
+    ════════════════════════════════ */
+    #exit-popup {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(8,20,40,.7); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    #exit-popup.show { display: flex; }
+    .popup-box {
+      background: var(--white); border-radius: var(--radius);
+      padding: 48px 40px; max-width: 480px; width: 90%; text-align: center;
+      position: relative; box-shadow: 0 24px 64px rgba(0,0,0,.2);
+    }
+    .popup-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; font-size: 1.4rem; color: var(--text);
+      cursor: pointer; line-height: 1;
+    }
+    .popup-label { font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+    .popup-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--navy); margin-bottom: 12px; }
+    .popup-sub { font-size: .9rem; color: var(--text); margin-bottom: 28px; }
+
+    /* ════════════════════════════════
        ANIMATIONS
     ════════════════════════════════ */
     .fade-in {
@@ -466,6 +516,8 @@
 </head>
 <body>
 
+  <div id="scroll-progress" aria-hidden="true"></div>
+
   <!-- ════════ HEADER ════════ -->
   <header id="header">
     <div class="container header-inner">
@@ -478,6 +530,7 @@
         <a href="#pourquoi">Pourquoi nous</a>
         <a href="#offre">Offre</a>
         <a href="#obligations">Obligations</a>
+        <a href="#faq">FAQ</a>
         <a href="#contact">Contact</a>
         <a href="#contact" class="btn btn-gold nav-cta">Devis gratuit</a>
       </nav>
@@ -509,8 +562,8 @@
             <a href="#offre" class="btn btn-outline">Voir notre offre</a>
           </div>
           <div class="hero-reassurance">
-            <div class="reassurance-item"><span class="dot"></span>25 € HT / bulletin</div>
-            <div class="reassurance-item"><span class="dot"></span>Réponse sous 24h</div>
+            <div class="reassurance-item"><span class="dot"></span><span data-target="25">0</span> € HT / bulletin</div>
+            <div class="reassurance-item"><span class="dot"></span>Réponse sous <span data-target="24">0</span>h</div>
             <div class="reassurance-item"><span class="dot"></span>Conformité garantie</div>
           </div>
         </div>
@@ -772,6 +825,57 @@
     </div>
   </section>
 
+  <!-- ════════ FAQ ════════ -->
+  <section id="faq" class="section" aria-label="Questions fréquentes">
+    <div class="container">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title">Les questions que nos clients posent le plus.</h2>
+      <div class="faq-list">
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            Combien de temps faut-il pour démarrer ?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Le démarrage prend en général 5 à 10 jours ouvrés. Nous récupérons vos données existantes, paramétrons votre dossier et prenons en charge votre première paie dès le mois suivant.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            Que se passe-t-il si j'ai une question urgente en cours de mois ?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Vous avez accès à une hotline paie dédiée. Nous nous engageons à vous répondre sous 24h ouvrées. Un interlocuteur unique connaît votre dossier et vous répond directement — pas de standard, pas de ticket.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            Dois-je m'engager sur une durée minimale ?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Non. Il n'y a aucun engagement de durée. Vous pouvez mettre fin à la prestation avec un préavis d'un mois. Vous ne payez que ce que vous utilisez.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            Comment transmettez-vous les bulletins à mes salariés ?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Les bulletins sont déposés dans un coffre-fort électronique individuel pour chaque salarié, conformément à l'obligation légale en vigueur depuis 2017. Chaque salarié reçoit une notification et peut consulter ses bulletins à tout moment.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            Le tarif de 25 € HT inclut-il vraiment tout ?
+            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Oui — bulletins, DSN, déclarations sociales, coffre-fort électronique, veille légale et hotline sont inclus. Seules les prestations complémentaires (contrats, rupture conventionnelle, audit…) font l'objet d'un devis séparé, toujours accepté avant exécution.</div></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- ════════ CONTACT ════════ -->
   <section id="contact" class="section" aria-label="Formulaire de contact">
     <div class="container">
@@ -847,6 +951,17 @@
     </div>
   </section>
 
+  <!-- ════════ POPUP DE SORTIE ════════ -->
+  <div id="exit-popup" role="dialog" aria-modal="true" aria-label="Avant de partir">
+    <div class="popup-box">
+      <button class="popup-close" id="popupClose" aria-label="Fermer">✕</button>
+      <div class="popup-label">Avant de partir</div>
+      <h2 class="popup-title">Un devis gratuit en 24h ?</h2>
+      <p class="popup-sub">Laissez-nous vos coordonnées — nous vous rappelons pour vous présenter une offre adaptée à votre structure, sans engagement.</p>
+      <a href="#contact" class="btn btn-gold" id="popupCta" style="font-size:.95rem;padding:14px 32px;">Demander mon devis</a>
+    </div>
+  </div>
+
   <!-- ════════ FOOTER ════════ -->
   <footer id="footer" aria-label="Pied de page">
     <div class="container footer-inner">
@@ -867,11 +982,83 @@
   </footer>
 
   <script>
+    // Barre de progression au scroll
+    const progressBar = document.getElementById('scroll-progress');
+    window.addEventListener('scroll', () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      progressBar.style.width = (window.scrollY / total * 100) + '%';
+    }, { passive: true });
+
     // Header scroll effect
     const header = document.getElementById('header');
     window.addEventListener('scroll', () => {
       header.classList.toggle('scrolled', window.scrollY > 20);
     }, { passive: true });
+
+    // Ancre active dans le menu
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('nav a[href^="#"]');
+    const observerNav = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          navLinks.forEach(l => l.style.color = '');
+          const active = document.querySelector('nav a[href="#' + e.target.id + '"]');
+          if (active && !active.classList.contains('btn')) active.style.color = 'var(--gold)';
+        }
+      });
+    }, { threshold: 0.4 });
+    sections.forEach(s => observerNav.observe(s));
+
+    // Compteurs animés
+    function animateCounter(el) {
+      const target = parseFloat(el.dataset.target);
+      const isInt = Number.isInteger(target);
+      const duration = 1200;
+      const start = performance.now();
+      function update(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const value = target * ease;
+        el.textContent = isInt ? Math.round(value) : value.toFixed(0);
+        if (progress < 1) requestAnimationFrame(update);
+        else el.textContent = isInt ? target : target;
+      }
+      requestAnimationFrame(update);
+    }
+    const counters = document.querySelectorAll('[data-target]');
+    const counterObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { animateCounter(e.target); counterObserver.unobserve(e.target); } });
+    }, { threshold: 0.5 });
+    counters.forEach(c => counterObserver.observe(c));
+
+    // FAQ accordéon
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item.open').forEach(i => {
+          i.classList.remove('open');
+          i.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        });
+        if (!isOpen) {
+          item.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+
+    // Popup de sortie
+    const exitPopup = document.getElementById('exit-popup');
+    let popupShown = false;
+    document.addEventListener('mouseleave', e => {
+      if (e.clientY < 20 && !popupShown) {
+        popupShown = true;
+        exitPopup.classList.add('show');
+      }
+    });
+    document.getElementById('popupClose').addEventListener('click', () => exitPopup.classList.remove('show'));
+    document.getElementById('popupCta').addEventListener('click', () => exitPopup.classList.remove('show'));
+    exitPopup.addEventListener('click', e => { if (e.target === exitPopup) exitPopup.classList.remove('show'); });
 
     // Hamburger menu
     const hamburger = document.getElementById('hamburger');
