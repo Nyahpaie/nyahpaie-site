@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NYAH PAIE — Externalisation de la paie pour TPE et PME</title>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
   <meta name="description" content="Bulletins conformes, DSN déposées, URSSAF maîtrisée. Externalisation de la paie à 25 € HT / bulletin, sans engagement, pour les TPE et PME françaises." />
   <link rel="canonical" href="https://nyahpaie.fr" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
@@ -17,6 +14,15 @@
   <meta property="og:title" content="NYAH PAIE — Externalisation de la paie pour TPE et PME" />
   <meta property="og:description" content="Bulletins conformes, DSN déposées, URSSAF maîtrisée. Externalisation de la paie à 25 € HT / bulletin, sans engagement, pour les TPE et PME françaises." />
   <meta property="og:locale" content="fr_FR" />
+  <meta property="og:image" content="https://nyahpaie.fr/assets/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="NYAH PAIE — Externalisation de la paie pour TPE et PME" />
+  <meta name="twitter:description" content="Bulletins conformes, DSN déposées, URSSAF maîtrisée. Externalisation de la paie à 25 € HT / bulletin, sans engagement, pour les TPE et PME françaises." />
+  <meta name="twitter:image" content="https://nyahpaie.fr/assets/og-image.png" />
 
   <!-- Schema.org -->
   <script type="application/ld+json">
@@ -30,7 +36,14 @@
     "priceRange": "25€ HT / bulletin",
     "areaServed": "FR",
     "inLanguage": "fr",
-    "serviceType": "Externalisation de la paie"
+    "serviceType": "Externalisation de la paie",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "25 Route de Chalmaison",
+      "addressLocality": "Everly",
+      "postalCode": "77157",
+      "addressCountry": "FR"
+    }
   }
   </script>
 
@@ -134,6 +147,7 @@
       transition: color var(--transition); letter-spacing: .02em;
     }
     nav a:hover { color: var(--white); }
+    nav a.active:not(.btn) { color: var(--gold); }
     .nav-cta { margin-left: 8px; }
 
     /* Hamburger */
@@ -442,29 +456,6 @@
     .faq-item.open .faq-answer { max-height: 300px; }
 
     /* ════════════════════════════════
-       POPUP DE SORTIE
-    ════════════════════════════════ */
-    #exit-popup {
-      display: none; position: fixed; inset: 0; z-index: 500;
-      background: rgba(8,20,40,.7); backdrop-filter: blur(4px);
-      align-items: center; justify-content: center;
-    }
-    #exit-popup.show { display: flex; }
-    .popup-box {
-      background: var(--white); border-radius: var(--radius);
-      padding: 48px 40px; max-width: 480px; width: 90%; text-align: center;
-      position: relative; box-shadow: 0 24px 64px rgba(0,0,0,.2);
-    }
-    .popup-close {
-      position: absolute; top: 16px; right: 16px;
-      background: none; border: none; font-size: 1.4rem; color: var(--text);
-      cursor: pointer; line-height: 1;
-    }
-    .popup-label { font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
-    .popup-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--navy); margin-bottom: 12px; }
-    .popup-sub { font-size: .9rem; color: var(--text); margin-bottom: 28px; }
-
-    /* ════════════════════════════════
        ANIMATIONS
     ════════════════════════════════ */
     .fade-in {
@@ -522,7 +513,7 @@
   <header id="header">
     <div class="container header-inner">
       <a href="#accueil" class="logo" aria-label="NYAH PAIE — Accueil">
-        <img src="assets/logo.png" alt="Logo NYAH PAIE" onerror="this.style.display='none'" />
+        <img src="assets/logo.png" alt="Logo NYAH PAIE" width="auto" height="48" onerror="this.style.display='none'" />
         <span class="logo-text">NYAH <span>PAIE</span></span>
       </a>
 
@@ -544,6 +535,7 @@
       <a href="#pourquoi">Pourquoi nous</a>
       <a href="#offre">Offre</a>
       <a href="#obligations">Obligations légales</a>
+      <a href="#faq">FAQ</a>
       <a href="#contact">Contact</a>
       <a href="#contact" class="btn btn-gold">Devis gratuit</a>
     </div>
@@ -881,14 +873,15 @@
   <section id="contact" class="section" aria-label="Formulaire de contact">
     <div class="container">
       <div class="section-label">Contact</div>
-      <h2 class="section-title" style="color:var(--white)">Parlons de votre paie.</h2>
-      <p class="section-sub" style="color:rgba(255,255,255,.6)">Réponse sous 24h ouvrées. Aucun engagement.</p>
+      <h2 class="section-title">Parlons de votre paie.</h2>
+      <p class="section-sub">Réponse sous 24h ouvrées. Aucun engagement.</p>
 
       <div class="contact-layout">
         <form class="contact-form" id="contactForm" aria-label="Formulaire de demande de devis">
           <input type="hidden" name="access_key" value="1dace16f-a6fd-452f-81ed-b1290fa9c4c9" />
           <input type="hidden" name="subject" value="Nouvelle demande de devis — NYAH PAIE" />
           <input type="hidden" name="from_name" value="NYAH PAIE Site" />
+          <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" />
           <div class="form-row">
             <div class="form-group">
               <label for="nom">Nom</label>
@@ -956,7 +949,7 @@
   <footer id="footer" aria-label="Pied de page">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <img src="assets/logo.png" alt="Logo NYAH PAIE" onerror="this.style.display='none'" />
+        <img src="assets/logo.png" alt="Logo NYAH PAIE" width="auto" height="34" onerror="this.style.display='none'" />
         <div>
           <div class="footer-brand-text">NYAH PAIE</div>
           <div class="footer-baseline">Externalisation de la paie · Conseils RH</div>
@@ -991,9 +984,12 @@
     const observerNav = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
-          navLinks.forEach(l => l.style.color = '');
+          navLinks.forEach(l => { l.classList.remove('active'); l.removeAttribute('aria-current'); });
           const active = document.querySelector('nav a[href="#' + e.target.id + '"]');
-          if (active && !active.classList.contains('btn')) active.style.color = 'var(--gold)';
+          if (active && !active.classList.contains('btn')) {
+            active.classList.add('active');
+            active.setAttribute('aria-current', 'true');
+          }
         }
       });
     }, { threshold: 0.4 });
@@ -1011,7 +1007,7 @@
         const value = target * ease;
         el.textContent = isInt ? Math.round(value) : value.toFixed(0);
         if (progress < 1) requestAnimationFrame(update);
-        else el.textContent = isInt ? target : target;
+        else el.textContent = isInt ? target : target.toFixed(1);
       }
       requestAnimationFrame(update);
     }
