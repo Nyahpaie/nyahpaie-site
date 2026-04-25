@@ -741,11 +741,7 @@
       <p class="section-sub" style="color:rgba(255,255,255,.6)">Réponse sous 24h ouvrées. Aucun engagement.</p>
 
       <div class="contact-layout">
-        <form class="contact-form" id="contactForm" action="https://api.web3forms.com/submit" method="POST" aria-label="Formulaire de demande de devis">
-          <input type="hidden" name="access_key" value="REMPLACER_PAR_VOTRE_CLE_WEB3FORMS" />
-          <input type="hidden" name="subject" value="Nouvelle demande de devis — NYAH PAIE" />
-          <input type="hidden" name="from_name" value="Site NYAH PAIE" />
-          <input type="hidden" name="redirect" value="false" />
+        <form class="contact-form" id="contactForm" aria-label="Formulaire de demande de devis">
           <div class="form-row">
             <div class="form-group">
               <label for="nom">Nom</label>
@@ -771,13 +767,7 @@
             <label for="message">Votre message</label>
             <textarea id="message" name="message" placeholder="Décrivez votre situation, vos besoins ou posez vos questions…"></textarea>
           </div>
-          <button type="submit" class="btn btn-gold form-submit" id="submitBtn">Envoyer ma demande</button>
-          <div id="formSuccess" style="display:none;margin-top:16px;padding:14px 18px;background:rgba(46,165,161,.15);border:1px solid rgba(46,165,161,.3);border-radius:4px;color:#2EA5A1;font-size:.9rem;text-align:center;">
-            Message envoyé. Nous vous répondons sous 24h ouvrées.
-          </div>
-          <div id="formError" style="display:none;margin-top:16px;padding:14px 18px;background:rgba(220,53,69,.12);border:1px solid rgba(220,53,69,.25);border-radius:4px;color:#dc3545;font-size:.9rem;text-align:center;">
-            Une erreur est survenue. Contactez-nous directement à contact@nyahpaie.fr
-          </div>
+          <button type="submit" class="btn btn-gold form-submit">Envoyer ma demande</button>
         </form>
 
         <div class="contact-info">
@@ -867,37 +857,23 @@
     }, { threshold: 0.1 });
     fadeEls.forEach(el => observer.observe(el));
 
-    // Formulaire Web3Forms
-    const contactForm = document.getElementById('contactForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const formSuccess = document.getElementById('formSuccess');
-    const formError = document.getElementById('formError');
-
-    contactForm.addEventListener('submit', async (e) => {
+    // Formulaire contact — ouvre Outlook/Mail avec les données pré-remplies
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Envoi en cours…';
-      formSuccess.style.display = 'none';
-      formError.style.display = 'none';
+      const nom      = document.getElementById('nom').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const salaries = document.getElementById('salaries').value;
+      const message  = document.getElementById('message').value.trim();
 
-      try {
-        const res = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          body: new FormData(contactForm)
-        });
-        const data = await res.json();
-        if (data.success) {
-          formSuccess.style.display = 'block';
-          contactForm.reset();
-        } else {
-          formError.style.display = 'block';
-        }
-      } catch {
-        formError.style.display = 'block';
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Envoyer ma demande';
-      }
+      const sujet = encodeURIComponent('Demande de devis — NYAH PAIE');
+      const corps = encodeURIComponent(
+        'Nom : ' + nom + '\n' +
+        'Email : ' + email + '\n' +
+        'Nombre de salariés : ' + salaries + '\n\n' +
+        (message || '(aucun message)')
+      );
+
+      window.location.href = 'mailto:contact@nyahpaie.fr?subject=' + sujet + '&body=' + corps;
     });
   </script>
 </body>
