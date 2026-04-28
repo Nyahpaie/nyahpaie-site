@@ -1138,6 +1138,55 @@
       btn.disabled = false;
       btn.textContent = 'Envoyer ma demande';
     });
+
+    /* ── Lecteur audio flottant ── */
+    (function () {
+      const audio = new Audio('assets/audio-site.ogg');
+      audio.loop = true;
+      audio.volume = 0.35;
+
+      const btn = document.createElement('button');
+      btn.id = 'audio-btn';
+      btn.setAttribute('aria-label', 'Lire la musique de fond');
+      btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path id="audio-icon-path" d="M8 5v14l11-7z"/>
+      </svg>`;
+
+      Object.assign(btn.style, {
+        position: 'fixed', bottom: '24px', left: '24px', zIndex: '999',
+        width: '44px', height: '44px', borderRadius: '50%', border: 'none',
+        background: 'rgba(11,26,58,0.85)', color: '#D4B064',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', boxShadow: '0 2px 12px rgba(0,0,0,.3)',
+        backdropFilter: 'blur(6px)', transition: 'transform .2s, opacity .2s',
+        opacity: '0.75'
+      });
+
+      btn.addEventListener('mouseenter', () => btn.style.opacity = '1');
+      btn.addEventListener('mouseleave', () => { if (!playing) btn.style.opacity = '0.75'; });
+
+      let playing = false;
+      const iconPath = btn.querySelector('#audio-icon-path');
+      const pauseD = 'M6 19h4V5H6v14zm8-14v14h4V5h-4z';
+      const playD  = 'M8 5v14l11-7z';
+
+      btn.addEventListener('click', () => {
+        if (playing) {
+          audio.pause();
+          iconPath.setAttribute('d', playD);
+          btn.setAttribute('aria-label', 'Lire la musique de fond');
+          btn.style.opacity = '0.75';
+        } else {
+          audio.play();
+          iconPath.setAttribute('d', pauseD);
+          btn.setAttribute('aria-label', 'Mettre en pause la musique');
+          btn.style.opacity = '1';
+        }
+        playing = !playing;
+      });
+
+      document.body.appendChild(btn);
+    })();
   </script>
 </body>
 </html>
